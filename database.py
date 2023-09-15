@@ -14,7 +14,9 @@ cursor.execute("""
          description TEXT,
          deadline TEXT,
          priority INTEGER,
-         labels Text)
+         labels Text,
+         progress INTEGER,
+         category TEXT)
          """)
 conn.commit()
 

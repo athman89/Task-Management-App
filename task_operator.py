@@ -1,16 +1,19 @@
 # This file contains functions for creating,reading,updating,
 # and deleting tasks.
+import sqlite3
 
 from database import cursor, conn
 
 
-def create_task(title, description, deadline, priority):
-    # Insert a new task into the database
-    cursor.execute("""
-        INSERT INTO tasks (title, description, deadline, priority)
-        VALUES (?, ?, ?, ?)
-      """, (title, description, deadline, priority))
-    conn.commit()
+def create_task(title, description, deadline, priority, category):
+    try:
+        cursor.execute("""
+            INSERT INTO tasks (title, description, deadline, priority, category)
+            VALUES (?, ?, ?, ?, ?)
+        """, (title, description, deadline, priority, category))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"SQLite error: {e}")
 
 
 def read_tasks():
@@ -18,6 +21,18 @@ def read_tasks():
     cursor.execute("SELECT * FROM tasks")
     tasks = cursor.fetchall()
     return tasks
+
+
+def update_task_progress(task_id, progress):
+    # Query to update_task_progress function
+    try:
+        sql_query = "UPDATE tasks SET progress = ? WHERE id = ?"
+        cursor.execute(sql_query, (progress, task_id))
+        conn.commit()
+
+    except sqlite3.Error as e:
+        print("Error updating task progress:", e)
+        conn.rollback()
 
 
 def update_task(task_id, title, description, deadline, priority):
