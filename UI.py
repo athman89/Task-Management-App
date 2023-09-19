@@ -2,7 +2,10 @@
 # the user is going to use. It uses the built-in python library
 # Tkinter to create the user interface.
 import tkinter as tk
-from task_operator import create_task, read_tasks, delete_task, update_task_progress
+
+from task_operator import create_task, read_tasks, delete_task, update_task_progress, filter_tasks_by_priority, \
+    sort_tasks_by_priority
+
 from task_reminder import set_task_remainder
 
 task_categories = {
@@ -16,6 +19,9 @@ root.title("Task management Application")
 
 task_list = tk.Listbox(root)
 task_list.pack()
+
+filter_priority = tk.Entry(root)
+filter_priority.pack()
 
 progress_var = tk.StringVar(root)
 category_var = tk.StringVar(root)
@@ -74,6 +80,47 @@ def delete_selected_task():
         update_task_list()
 
 
+def filter_tasks_priority():
+    # Clear the task list
+    task_list.delete(0, tk.END)
+
+    # Get the priority value entered by the user
+    priority = int(filter_priority.get())
+
+    # Call the filter_tasks_by_priority function with the user-provided priority
+    tasks = filter_tasks_by_priority(priority)
+    for task in tasks:
+        if len(task) >= 2:
+            task_title = task[1]
+        else:
+            task_title = "Title N/A"
+
+        if len(task) >= 5 and isinstance(task[4], int):
+            task_priority = task[4]
+        else:
+            task_priority = "Priority N/A"
+
+        task_list.insert(tk.END, f"{task_title} - Priority: {task_priority}")
+
+
+# Create a function to sort tasks by priority
+def sort_tasks_priority():
+    task_list.delete(0, tk.END)
+    tasks = sort_tasks_by_priority()
+    for task in tasks:
+        if len(task) >= 2:
+            task_title = task[1]
+        else:
+            task_title = "Title N/A"
+
+        if len(task) >= 5 and isinstance(task[4], int):
+            task_priority = task[4]
+        else:
+            task_priority = "Priority N/A"
+
+        task_list.insert(tk.END, f"{task_title} - Priority: {task_priority}")
+
+
 def set_reminder(task_id, title, deadline, reminder_minutes):
     # Get the remainder time in minutes from the user input
     reminder_seconds = reminder_minutes * 60
@@ -102,6 +149,8 @@ def create_ui():
     btn_delete_task = tk.Button(root, text="Delete Selected Task", command=delete_selected_task)
     btn_set_reminder = tk.Button(root, text="Set Remainder", command=set_reminder)
     btn_mark_completed = tk.Button(root, text="Mark Completed", command=mark_task_completed)
+    btn_sort_by_priority = tk.Button(root, text="Sort by Priority", command=sort_tasks_priority)
+    btn_filter_by_priority = tk.Button(root, text="Filter by Priority", command=filter_tasks_priority)
 
     # Place UI elements in the window
     label_title.pack()
@@ -113,12 +162,14 @@ def create_ui():
     label_priority.pack()
     entry_priority.pack()
     btn_add_task.pack()
+    category_dropdown.pack()
+    label_category.pack()
     btn_delete_task.pack()
     label_reminder.pack()
     entry_reminder.pack()
     btn_set_reminder.pack()
-    label_category.pack()
-    category_dropdown.pack()
+    btn_sort_by_priority.pack()
+    btn_filter_by_priority.pack()
     btn_mark_completed.pack()
 
     # Start the Tkinter main loop
